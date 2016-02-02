@@ -1,24 +1,49 @@
 # To get started with security, check out the documentation:
 # http://symfony.com/doc/current/book/security.html
+
 security:
 
-    # http://symfony.com/doc/current/book/security.html#where-do-users-come-from-user-providers
+    encoders:
+        AppBundle\Entity\User:
+            algorithm: bcrypt
+            
     providers:
-        in_memory:
-            memory: ~
+#        in_memory:
+#            memory: 
+#                users:
+#                    admin:
+#                        password: admin
+#                        password: $2a$08$jHZj/wJfcVKlIwr5AvR78euJxYK7Ku5kURNhNx.7.CSIJ3Pq6LEPC
+                        
+        db_provider:
+            entity:
+                class: AppBundle:User
+                property: username                        
 
     firewalls:
-        # disables authentication for assets and the profiler, adapt it according to your needs
+        # disables authentication for dev resources and the profiler
         dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            pattern: ^/(_(profiler|wdt))/
             security: false
 
+        # disables authentication for resources (assets)
+        resources:
+            pattern: ^/(css|images|img|js|fonts)/
+            security: false            
+        
+        # main firewall
         main:
             anonymous: ~
-            # activate different ways to authenticate
+            provider: db_provider
+            form_login:
+                login_path: /login
+                check_path: /login_check    
+                csrf_token_generator: security.csrf.token_manager
+                # csrf_provider: security.csrf.token_manager # ne pas utiliser même si cela figure sur la documentation. La doc n'est pas sync
+            logout:
+                path: /logout
+                target: /
 
-            # http_basic: ~
-            # http://symfony.com/doc/current/book/security.html#a-configuring-how-your-users-will-authenticate
-
-            # form_login: ~
-            # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
+    access_control:
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }

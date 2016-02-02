@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * User
@@ -11,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="user")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
  */
-class User
+class User implements UserInterface, \Serializable
 {
     /**
      * @var int
@@ -25,12 +26,12 @@ class User
     /**
      * @var string
      *
-     * @ORM\Column(name="userName", type="string", length=255, unique=true)
+     * @ORM\Column(name="username", type="string", length=255, unique=true)
      * 
      * @Assert\NotBlank()
      * @Assert\NotNull()
      */
-    private $userName;
+    private $username;
 
     /**
      * @var string
@@ -59,6 +60,13 @@ class User
      * @Assert\Regex("/^[^_].*\.(jpeg|gif|png|jpg)$/i")
      */
     private $avatarUrl;
+    
+    /*
+        All passwords must be hashed with a salt, except bcrypt. bcrypt does this internally. 
+        Since we use bcrypt, the getSalt() method in User can just return null (it's not used). 
+        If we use a different algorithm, we'll need to uncomment the salt lines in the User entity and add a persisted salt property.
+     */     
+    // private $salt;    
 
     /**
      * Get id
@@ -71,27 +79,27 @@ class User
     }
 
     /**
-     * Set userName
+     * Set username
      *
-     * @param string $userName
+     * @param string $username
      *
      * @return User
      */
-    public function setUserName($userName)
+    public function setUsername($username)
     {
-        $this->userName = $userName;
+        $this->username = $username;
 
         return $this;
     }
 
     /**
-     * Get userName
+     * Get username
      *
      * @return string
      */
-    public function getUserName()
+    public function getUsername()
     {
-        return $this->userName;
+        return $this->username;
     }
 
     /**
@@ -165,5 +173,36 @@ class User
     {
         return $this->avatarUrl;
     }
+    
+
+    public function eraseCredentials() {        
+    }
+
+    public function getRoles() {
+        return array();
+    }
+
+    public function getSalt() {
+        return null; // Change this if you're not using bcript to encode passwords !        
+    }
+
+    public function serialize() {
+        return serialize(array(
+            $this->id,
+            $this->username,
+            $this->password,            
+                // $this->salt,
+        ));        
+    }
+
+    public function unserialize($serialized) {
+        list (
+                $this->id,
+                $this->username,
+                $this->password,
+                // $this->salt
+                ) = unserialize($serialized);        
+    }
+
 }
 
