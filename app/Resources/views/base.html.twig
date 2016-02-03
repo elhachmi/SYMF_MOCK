@@ -53,6 +53,14 @@
                     radioClass: 'iradio_square-blue',
                     increaseArea: '20%' // optional
                     });
+                    $('#user_avatarUrl').on("change" , function(){
+                    var input = document.getElementById("user_avatarUrl");
+                    var fReader = new FileReader();
+                    fReader.readAsDataURL(input.files[0]);
+                    fReader.onloadend = function(event){
+                            $('#imgavatar').attr("src",event.target.result);
+                        };
+                     });
                 });
             </script>
         {% endblock %}  
