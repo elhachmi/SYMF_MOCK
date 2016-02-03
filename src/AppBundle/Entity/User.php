@@ -28,8 +28,8 @@ class User implements UserInterface, \Serializable
      *
      * @ORM\Column(name="username", type="string", length=255, unique=true)
      * 
+     * @Assert\Length(min=3, max=255)
      * @Assert\NotBlank()
-     * @Assert\NotNull()
      */
     private $username;
 
@@ -38,8 +38,8 @@ class User implements UserInterface, \Serializable
      *
      * @ORM\Column(name="password", type="string", length=255)
      * 
+     * @Assert\Length(min=6, max=255)
      * @Assert\NotBlank()
-     * @Assert\NotNull()
      */
     private $password;
 
@@ -48,6 +48,8 @@ class User implements UserInterface, \Serializable
      *
      * @ORM\Column(name="email", type="string", length=255, unique=true)
      * 
+     * @Assert\Length(max=255)
+     * @Assert\NotBlank()
      * @Assert\Email
      */
     private $email;
