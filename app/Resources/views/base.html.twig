@@ -1,13 +1,54 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8" />
         <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
-        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" charset="UTF-8" name="viewport">
+
+        {% block stylesheets %}   
+            <!-- Bootstrap 3.3.5 -->
+            <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap.min.css') }}">
+            <!-- Font Awesome -->
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+            <!-- Ionicons -->
+            <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+            <!-- Theme style -->
+            <link rel="stylesheet" href="{{ asset('css/AdminLTE.min.css') }}">
+            <!-- iCheck -->
+            <link rel="stylesheet" href="{{ asset('lib/iCheck/square/blue.css') }}">
+        {% endblock %}
+       
     </head>
-    <body>
-        {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
+    <body class="{% block body_class %}{% endblock %}">
+        {% block header %}
+            <header></header>
+        {% endblock %}
+
+        {% block body %}
+
+
+        {% endblock %}
+
+        {% block footer %}
+            <footer></footer>
+        {% endblock %}
+
+        {% block javascripts %}
+            <!-- jQuery 2.1.4 -->
+            <script src="lib/jQuery/jQuery-2.1.4.min.js"></script>
+            <!-- Bootstrap 3.3.5 -->
+            <script src="lib/bootstrap/js/bootstrap.min.js"></script>
+            <!-- iCheck -->
+            <script src="lib/iCheck/icheck.min.js"></script>
+            <script>
+                $(function () {
+                    $('input').iCheck({
+                    checkboxClass: 'icheckbox_square-blue',
+                    radioClass: 'iradio_square-blue',
+                    increaseArea: '20%' // optional
+                    });
+                });
+            </script>
+        {% endblock %}  
+
     </body>
 </html>
