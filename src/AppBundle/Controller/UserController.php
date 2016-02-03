@@ -18,14 +18,15 @@ class UserController extends Controller
      * @Route("/signup")
      * @Method({"GET", "POST"})
      */
-    function signUpAction(Request $request) {
+    function signUpAction(Request $request) 
+    {
 
         $user = new User();
 
         $form = $this->createForm(UserType::class, $user);
 
         $form->handleRequest($request);
-        
+
         if ($form->isSubmitted()) {
             
             if ($this->isUserEmailAlreadyExisted($user->getEmail())) {
@@ -34,8 +35,10 @@ class UserController extends Controller
             if ($this->isUsernameAlreadyExisted($user->getUsername())) {
                 $form->addError(new FormError('username already used'));
             }
-            
+
             if ($form->isValid()) {
+                
+                // Upload user avatar ...
                 
                 $this->uploadUserAvatar($user);
                 
@@ -47,7 +50,7 @@ class UserController extends Controller
                 $user->setPassword($password);
 
                 // create user ...
-
+                
                 $em = $this->getDoctrine()->getManager();
 
                 $em->persist($user);
@@ -70,7 +73,14 @@ class UserController extends Controller
         $file = $user->getAvatarUrl();
 
         if ($file != null) {
-            $fileName = $user->getUsername() . '_avatar.' . $file->guessExtension();
+            
+            $username = $user->getUsername();
+            
+            $username = trim($username);
+            
+            $username = preg_replace('/\s+/', '_', $username);
+            
+            $fileName = $username. '_avatar.' . $file->guessExtension();
 
             $avatarsDir = $this->container->getParameter('kernel.root_dir') . UserType::USER_AVATAR_DIR;
 
@@ -86,7 +96,7 @@ class UserController extends Controller
 
         $repository = $this->getDoctrine()->getRepository('AppBundle:User');
         
-        $usersWithSameUsername = $repository->findByEmail($username);
+        $usersWithSameUsername = $repository->findByUsername($username);
          
         if (count($usersWithSameUsername) != null) {
              return true;
@@ -107,6 +117,20 @@ class UserController extends Controller
         }
         return false;
     }
-            
+    
+    
+    /**
+     * @Route("user/{id}") ,name="user_info" 
+     */
+	function getUserInfo($id){
+
+		 $user = $this->getDoctrine()
+                      ->getRepository('AppBundle:User')
+                      ->find($id);
+
+		return $this->render('profile.html.twig',array(
+			"user"=>$user));
+
+	}
 
 }
