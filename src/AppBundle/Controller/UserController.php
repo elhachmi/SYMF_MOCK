@@ -57,7 +57,7 @@ class UserController extends Controller
 
                 $em->flush();
 
-                return $this->redirect($this->generateUrl('homepage'));
+                return $this->redirect($this->generateUrl('user_info', array('id' => $user->getId())));
             }
         }
         
@@ -120,23 +120,7 @@ class UserController extends Controller
     
     
     /**
-     * @Route("user/{id}") ,name="user_info" 
-     */
-	function getUserInfo($id){
-
-		 $user = $this->getDoctrine()
-                      ->getRepository('AppBundle:User')
-                      ->find($id);
-
-		return $this->render('profile.html.twig',array(
-			"user"=>$user));
-
-	}
-
-
-
-    /**
-     * @Route("user/{id}") ,name="user_info" 
+     * @Route("user/{id}",name="user_info" )
      */
 	function getUserInfo($id){
 
