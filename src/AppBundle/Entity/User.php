@@ -57,7 +57,9 @@ class User implements UserInterface, \Serializable
      *
      * @ORM\Column(name="avatarUrl", type="string", length=255, nullable=true)
      * 
-     * @Assert\Regex("/^[^_].*\.(jpeg|gif|png|jpg)$/i")
+     * @Assert\File(
+     *      mimeTypes = {"image/jpeg", "image/gif", "image/png"},
+     * )
      */
     private $avatarUrl;
     
