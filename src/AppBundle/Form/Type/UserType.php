@@ -26,6 +26,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UserType extends AbstractType
 {
+    const USER_AVATAR_DIR = "/../web/uploads/avatars";
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -33,9 +35,6 @@ class UserType extends AbstractType
                     'required' => true,
                     ))
                 ->add('email', EmailType::class, array(
-                    'required' => true,
-                    ))
-                ->add('password', PasswordType::class, array(
                     'required' => true,
                     ))
                 ->add('password', RepeatedType::class, array(
