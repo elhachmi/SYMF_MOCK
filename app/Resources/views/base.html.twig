@@ -15,22 +15,29 @@
             <link rel="stylesheet" href="{{ asset('css/AdminLTE.min.css') }}">
             <!-- iCheck -->
             <link rel="stylesheet" href="{{ asset('lib/iCheck/square/blue.css') }}">
+
+            <link rel="stylesheet" href="{{ asset('css/skins/_all-skins.min.css') }}">
+
+
         {% endblock %}
        
     </head>
     <body class="{% block body_class %}{% endblock %}">
-        {% block header %}
-            <header></header>
-        {% endblock %}
+        <header class="{% block header_class %}{% endblock %}">
+            {% block header %}{% endblock %}
+        </header>
+        
 
         {% block body %}
 
 
         {% endblock %}
-
-        {% block footer %}
-            <footer></footer>
-        {% endblock %}
+         
+      <!--   <footer class="{% block footer_class %} {% endblock %}">
+            {% block footer %}
+            {% endblock %}
+        </footer>  -->
+        
 
         {% block javascripts %}
             <!-- jQuery 2.1.4 -->
