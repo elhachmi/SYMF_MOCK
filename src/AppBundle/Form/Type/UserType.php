@@ -9,12 +9,13 @@
 namespace AppBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Description of UserType
@@ -37,9 +38,11 @@ class UserType extends AbstractType
                 ->add('password', PasswordType::class, array(
                     'required' => true,
                     ))
-                ->add('confirmPassword', PasswordType::class, array(
-                    'mapped' => false, 
+                ->add('password', RepeatedType::class, array(
+                    'type' => PasswordType::class,
                     'required' => true,
+                    'first_options'  => array('label' => 'Password'),
+                    'second_options' => array('label' => 'Repeat Password'),
                     ))
                 ->add('avatarUrl', FileType::class, array(
                     'required' => false,
@@ -53,6 +56,7 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'AppBundle\Entity\User',
+            'allow_extra_fields' => true,
         ));
     }
 
