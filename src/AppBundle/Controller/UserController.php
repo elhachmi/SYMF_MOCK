@@ -4,18 +4,20 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\User;
 use AppBundle\Form\Type\UserType;
+use AppBundle\Form\Type\UpdateUserType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class UserController extends Controller 
 {
 
     /**
-     * @Route("/signup")
+     * @Route("/signup", name="signup")
      * @Method({"GET", "POST"})
      */
     function signUpAction(Request $request) 
@@ -57,7 +59,12 @@ class UserController extends Controller
 
                 $em->flush();
 
-                return $this->redirect($this->generateUrl('homepage'));
+                //Authenticate User so he can access to profile
+                $token = new UsernamePasswordToken($user, null, "main", $user->getRoles());
+                $this->get("security.token_storage")->setToken($token); //now the user is logged in
+                $this->get('session')->set('_security_secured_area', serialize($token));
+                
+                return $this->redirectToRoute('user_info', array('id' => $user->getId()) );
             }
         }
         
@@ -120,7 +127,7 @@ class UserController extends Controller
     
     
     /**
-     * @Route("user/{id}") ,name="user_info" 
+     * @Route("user/{id}" ,name="user_info") 
      */
 	function getUserInfo($id){
 
@@ -132,21 +139,44 @@ class UserController extends Controller
 			"user"=>$user));
 
 	}
-
-
 
     /**
-     * @Route("user/{id}") ,name="user_info" 
+     * @Route("/login_success" , name="login_success")
      */
-	function getUserInfo($id){
-
-		 $user = $this->getDoctrine()
-                      ->getRepository('AppBundle:User')
-                      ->find($id);
-
-		return $this->render('profile.html.twig',array(
-			"user"=>$user));
-
-	}
+    public function loginSuccessAction()
+    {
+        return $this->redirectToRoute("user_info", array("id" => $this->getUser()->getId()));
+    }
+    
+    /**
+     * @Route("/user/{id}/update", name="update_profile")
+     */
+    public function updateProfileAction($id, Request $request)
+    {
+        $user = $this->getDoctrine()
+                ->getRepository('AppBundle:User')
+                ->find($id); 
+        
+        $form = $this->createForm(UpdateUserType::class, $user);
+        $form->handleRequest($request);
+        
+        if($form->isSubmitted()){
+            if ($this->isUserEmailAlreadyExisted($user->getEmail())) {
+                $form->addError(new FormError('email already used'));
+            }
+            
+            if($form->isValid()){
+                $em = $this->getDoctrine()->getEntityManager();
+                $em->persist($user);
+                $em->flush();    
+                return $this->redirectToRoute("user_info", array("id" => $user->getId()));
+            }
+        }
+        
+        return $this->render('update_profile.html.twig',array(
+            "user" => $user,
+            "form" => $form->createView(),
+        ));        
+    }
 }
 
