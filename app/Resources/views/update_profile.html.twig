@@ -36,7 +36,8 @@
                                     <img class="profile-user-img img-responsive img-circle" 
                                          src="{{ asset('uploads/avatars/' ~ oldUserAvatarUrl) }}" alt="User profile picture">
                                     <h3 class="profile-username text-center">{{ user.username }}</h3>
-                                    <a href="{{ url('logout')}}" class="text-center">Log out</a>
+                                    <a href="{{ url('logout')}}" class="text-center">Log out</a> | 
+                                    <a href="{{ url('change_password', {'id' : app.request.get('id') } )}}"  class="text-center">Change password</a>
                                 </div><!-- /.box-body -->
                             </div><!-- /.box -->             
                         </div><!-- /.col -->
@@ -73,7 +74,7 @@
                                             </div>
                                         </div>
                                         {{ form_widget(form._token) }}
-                                    </form>
+                                        </form>
                                     </div><!-- /.tab-pane -->
                                 </div><!-- /.tab-content -->
                             </div><!-- /.nav-tabs-custom -->
@@ -90,8 +91,8 @@
             </footer>
 
         </div><!-- ./wrapper -->
-
-
+        
+        
     {% endblock %} 
 
 

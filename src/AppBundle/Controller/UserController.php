@@ -5,6 +5,8 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\User;
 use AppBundle\Form\Type\UserType;
 use AppBundle\Form\Type\UpdateUserType;
+use AppBundle\Form\Type\ChangeUserPasswordType;
+use AppBundle\Form\Model\ChangeUserPassword;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -185,6 +187,35 @@ class UserController extends Controller
             "oldUserAvatarUrl" => $oldUserAvatarUrl,
             "form" => $form->createView(),
         ));        
+    }
+    
+    /**
+     * @Route("/user/{id}/change_password", name="change_password")
+     */    
+    public function changePasswordAction($id, Request $request)
+    {
+        $user = $this->getDoctrine()->getRepository('AppBundle:User')->find($id); 
+        
+        $changeUserPasswordModel = new ChangeUserPassword();
+        $form = $this->createForm(ChangeUserPasswordType::class, $changeUserPasswordModel);
+        $form->handleRequest($request);        
+        
+        if($form->isSubmitted() && $form->isValid()){
+            // Encode pasword ...
+            $encoder = $this->get('security.password_encoder');
+            $password = $encoder->encodePassword($user, $changeUserPasswordModel->getNewPassword());
+            $user->setPassword($password); 
+
+            $em = $this->getDoctrine()->getEntityManager();
+            $em->persist($user);
+            $em->flush();
+            return $this->redirectToRoute("user_info", array("id" => $user->getId()));                            
+        }
+        
+        return $this->render('change_password.html.twig',array(
+            "user" => $user,
+            "form" => $form->createView(),
+        ));          
     }
 }
 

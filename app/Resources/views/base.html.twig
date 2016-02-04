@@ -41,11 +41,11 @@
 
         {% block javascripts %}
             <!-- jQuery 2.1.4 -->
-            <script src="lib/jQuery/jQuery-2.1.4.min.js"></script>
+            <script src="{{ asset('lib/jQuery/jQuery-2.1.4.min.js') }}"></script>
             <!-- Bootstrap 3.3.5 -->
-            <script src="lib/bootstrap/js/bootstrap.min.js"></script>
+            <script src="{{ asset('lib/bootstrap/js/bootstrap.min.js') }}"></script>
             <!-- iCheck -->
-            <script src="lib/iCheck/icheck.min.js"></script>
+            <script src="{{ asset('lib/iCheck/icheck.min.js') }}"></script>
             <script>
                 $(function () {
                     $('input').iCheck({
