@@ -141,31 +141,22 @@ class UserController extends Controller
 
 	}
 
-    /**
-     * @Route("/login_success" , name="login_success")
-     */
-    public function loginSuccessAction()
-    {
-        return $this->redirectToRoute("user_info", array("id" => $this->getUser()->getId()));
-    }
     
     /**
      * @Route("/user/{id}/update", name="update_profile")
      */
     public function updateProfileAction($id, Request $request)
     {
-        $user = $this->getDoctrine()
-                ->getRepository('AppBundle:User')
-                ->find($id); 
+        $user = $this->getDoctrine()->getRepository('AppBundle:User')->find($id);         
+        $oldEmail = $user->getEmail(); // TODO find a way to get all modified fields        
+        $oldUserAvatarUrl = $user->getAvatarUrl();
         
-        $oldEmail = $user->getEmail(); // TODO find a way to get all modified fields
-        
-        $userAvatarUrl = $user->getAvatarUrl();
         try{
-            $userAvatar = new File('uploads/avatars/' . $userAvatarUrl);
+            $userAvatar = new File('uploads/avatars/' . $oldUserAvatarUrl);
         } catch (\Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException $ex) {
             $userAvatar = null;
         }        
+        
         $user->setAvatarUrl($userAvatar); //Required by Symfony form FileType that need a File object not string
         
         $form = $this->createForm(UpdateUserType::class, $user);
@@ -173,14 +164,14 @@ class UserController extends Controller
         
         if($form->isSubmitted()){
             if ($oldEmail != $user->getEmail() && $this->isUserEmailAlreadyExisted($user->getEmail())) {
-                $form->addError(new FormError('email already used'));
+                $form->addError(new FormError('Email already used'));
             }
             
             if($form->isValid()){
                 if($user->getAvatarUrl() != null){
                     $this->uploadUserAvatar($user);
                 }else{
-                    $user->setAvatarUrl($userAvatarUrl);
+                    $user->setAvatarUrl($oldUserAvatarUrl);
                 }
                 $em = $this->getDoctrine()->getEntityManager();
                 $em->persist($user);
@@ -191,6 +182,7 @@ class UserController extends Controller
         
         return $this->render('update_profile.html.twig',array(
             "user" => $user,
+            "oldUserAvatarUrl" => $oldUserAvatarUrl,
             "form" => $form->createView(),
         ));        
     }
