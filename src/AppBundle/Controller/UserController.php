@@ -10,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
@@ -157,15 +158,30 @@ class UserController extends Controller
                 ->getRepository('AppBundle:User')
                 ->find($id); 
         
+        $oldEmail = $user->getEmail(); // TODO find a way to get all modified fields
+        
+        $userAvatarUrl = $user->getAvatarUrl();
+        try{
+            $userAvatar = new File('uploads/avatars/' . $userAvatarUrl);
+        } catch (\Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException $ex) {
+            $userAvatar = null;
+        }        
+        $user->setAvatarUrl($userAvatar); //Required by Symfony form FileType that need a File object not string
+        
         $form = $this->createForm(UpdateUserType::class, $user);
         $form->handleRequest($request);
         
         if($form->isSubmitted()){
-            if ($this->isUserEmailAlreadyExisted($user->getEmail())) {
+            if ($oldEmail != $user->getEmail() && $this->isUserEmailAlreadyExisted($user->getEmail())) {
                 $form->addError(new FormError('email already used'));
             }
             
             if($form->isValid()){
+                if($user->getAvatarUrl() != null){
+                    $this->uploadUserAvatar($user);
+                }else{
+                    $user->setAvatarUrl($userAvatarUrl);
+                }
                 $em = $this->getDoctrine()->getEntityManager();
                 $em->persist($user);
                 $em->flush();    
