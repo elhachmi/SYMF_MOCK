@@ -47,7 +47,7 @@ class SecurityController extends Controller
     /**
      * When the login form is submit correctly. The user is redirected to this route.
      *
-     * @Route("/login_success"                           , name="login_success")
+     * @Route("/login_success", name="login_success")
      * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
      */
     public function loginSuccessAction()
