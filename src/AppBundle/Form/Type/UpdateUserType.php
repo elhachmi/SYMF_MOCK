@@ -11,41 +11,42 @@ namespace AppBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Description of UserType
+ * Description of UserType.
  *
  * @author reda
  */
-
-
 class UpdateUserType extends AbstractType
 {
-
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder)
     {
         $builder
-                ->add('email', EmailType::class, array(
+            ->add(
+                'email',
+                EmailType::class,
+                array(
                     'required' => true,
-                    ))
-                ->add('avatarUrl', FileType::class, array(
+                    )
+            )
+            ->add(
+                'avatarUrl',
+                FileType::class,
+                array(
                     'required' => false,
-                ))
-            ;
-    }
-    
-    
-    public function configureOptions(OptionsResolver $resolver) 
-    {
-        $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Entity\User',
-            'allow_extra_fields' => true,
-        ));
+                    )
+            );
     }
 
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(
+            array(
+            'data_class' => 'AppBundle\Entity\User',
+            'allow_extra_fields' => true,
+            )
+        );
+    }
 }
