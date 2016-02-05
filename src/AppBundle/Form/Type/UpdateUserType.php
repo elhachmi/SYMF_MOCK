@@ -29,14 +29,14 @@ class UpdateUserType extends AbstractType
                 EmailType::class,
                 array(
                     'required' => true,
-                    )
+                )
             )
             ->add(
                 'avatarUrl',
                 FileType::class,
                 array(
                     'required' => false,
-                    )
+                )
             );
     }
 
@@ -44,8 +44,8 @@ class UpdateUserType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-            'data_class' => 'AppBundle\Entity\User',
-            'allow_extra_fields' => true,
+                'data_class' => 'AppBundle\Entity\User',
+                'allow_extra_fields' => true,
             )
         );
     }

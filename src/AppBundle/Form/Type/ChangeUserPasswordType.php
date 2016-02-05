@@ -29,7 +29,7 @@ class ChangeUserPasswordType extends AbstractType
                 PasswordType::class,
                 array(
                     'required' => true,
-                    )
+                )
             )
             ->add(
                 'newPassword',
@@ -37,7 +37,7 @@ class ChangeUserPasswordType extends AbstractType
                 array(
                     'type' => PasswordType::class,
                     'required' => true,
-                    )
+                )
             );
     }
 

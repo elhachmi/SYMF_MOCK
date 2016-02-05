@@ -34,14 +34,14 @@ class UserType extends AbstractType
                 null,
                 array(
                     'required' => true,
-                    )
+                )
             )
             ->add(
                 'email',
                 EmailType::class,
                 array(
                     'required' => true,
-                    )
+                )
             )
             ->add(
                 'password',
@@ -51,14 +51,14 @@ class UserType extends AbstractType
                     'required' => true,
                     'first_options' => array('label' => 'Password'),
                     'second_options' => array('label' => 'Repeat Password'),
-                    )
+                )
             )
             ->add(
                 'avatarUrl',
                 FileType::class,
                 array(
                     'required' => false,
-                    )
+                )
             )
             ->add('save', SubmitType::class);
     }
@@ -67,8 +67,8 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-            'data_class' => 'AppBundle\Entity\User',
-            'allow_extra_fields' => true,
+                'data_class' => 'AppBundle\Entity\User',
+                'allow_extra_fields' => true,
             )
         );
     }

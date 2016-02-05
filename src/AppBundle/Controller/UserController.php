@@ -70,7 +70,7 @@ class UserController extends Controller
         return $this->render(
             'register.html.twig',
             array(
-            'form' => $form->createView(),
+                'form' => $form->createView(),
             )
         );
     }
@@ -142,7 +142,7 @@ class UserController extends Controller
         return $this->render(
             'profile.html.twig',
             array(
-            'user' => $user,
+                'user' => $user,
             )
         );
     }
@@ -189,9 +189,9 @@ class UserController extends Controller
         return $this->render(
             'update_profile.html.twig',
             array(
-            'user' => $user,
-            'oldUserAvatarUrl' => $oldUserAvatarUrl,
-            'form' => $form->createView(),
+                'user' => $user,
+                'oldUserAvatarUrl' => $oldUserAvatarUrl,
+                'form' => $form->createView(),
             )
         );
     }
@@ -223,8 +223,8 @@ class UserController extends Controller
         return $this->render(
             'change_password.html.twig',
             array(
-            'user' => $user,
-            'form' => $form->createView(),
+                'user' => $user,
+                'form' => $form->createView(),
             )
         );
     }
