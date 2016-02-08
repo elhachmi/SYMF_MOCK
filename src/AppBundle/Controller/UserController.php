@@ -136,9 +136,9 @@ class UserController extends Controller
 
     public function getUserInfo($id)
     {
-        $user = $this->getDoctrine()
-            ->getRepository('AppBundle:User')
-            ->find($id);
+//        $user = $this->getDoctrine()
+//            ->getRepository('AppBundle:User')
+//            ->find($id);
         
         $userService = $this->get('app.user_service');
         $user = $userService->findUser($id);
