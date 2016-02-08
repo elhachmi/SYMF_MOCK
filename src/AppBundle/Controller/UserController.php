@@ -133,11 +133,15 @@ class UserController extends Controller
     /**
      * @Route("user/{id}" ,name="user_info")
      */
+
     public function getUserInfo($id)
     {
-        $user = $this->getDoctrine()
-            ->getRepository('AppBundle:User')
-            ->find($id);
+//        $user = $this->getDoctrine()
+//            ->getRepository('AppBundle:User')
+//            ->find($id);
+        
+        $userService = $this->get('app.user_service');
+        $user = $userService->findUser($id);
 
         return $this->render(
             'profile.html.twig',
