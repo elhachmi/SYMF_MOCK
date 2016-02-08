@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * User
+ * User.
  *
  * @ORM\Table(name="user")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
@@ -27,7 +27,7 @@ class User implements UserInterface, \Serializable
      * @var string
      *
      * @ORM\Column(name="username", type="string", length=255, unique=true)
-     * 
+     *
      * @Assert\Length(min=3, max=255)
      * @Assert\NotBlank()
      */
@@ -37,7 +37,7 @@ class User implements UserInterface, \Serializable
      * @var string
      *
      * @ORM\Column(name="password", type="string", length=255)
-     * 
+     *
      * @Assert\Length(min=6, max=255)
      * @Assert\NotBlank()
      */
@@ -47,7 +47,7 @@ class User implements UserInterface, \Serializable
      * @var string
      *
      * @ORM\Column(name="email", type="string", length=255, unique=true)
-     * 
+     *
      * @Assert\Length(max=255)
      * @Assert\NotBlank()
      * @Assert\Email
@@ -58,22 +58,23 @@ class User implements UserInterface, \Serializable
      * @var string
      *
      * @ORM\Column(name="avatarUrl", type="string", length=255, nullable=true)
-     * 
+     *
      * @Assert\File(
      *      mimeTypes = {"image/jpeg", "image/gif", "image/png"},
      * )
      */
     private $avatarUrl;
-    
+
     /*
         All passwords must be hashed with a salt, except bcrypt. bcrypt does this internally. 
         Since we use bcrypt, the getSalt() method in User can just return null (it's not used). 
-        If we use a different algorithm, we'll need to uncomment the salt lines in the User entity and add a persisted salt property.
-     */     
-    // private $salt;    
+        If we use a different algorithm, we'll need to uncomment the salt lines, 
+        and add a persisted salt property.
+     */
+    // private $salt;
 
     /**
-     * Get id
+     * Get id.
      *
      * @return int
      */
@@ -87,7 +88,7 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * Set username
+     * Set username.
      *
      * @param string $username
      *
@@ -101,7 +102,7 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * Get username
+     * Get username.
      *
      * @return string
      */
@@ -111,7 +112,7 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * Set password
+     * Set password.
      *
      * @param string $password
      *
@@ -125,7 +126,7 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * Get password
+     * Get password.
      *
      * @return string
      */
@@ -135,7 +136,7 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * Set email
+     * Set email.
      *
      * @param string $email
      *
@@ -149,7 +150,7 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * Get email
+     * Get email.
      *
      * @return string
      */
@@ -159,7 +160,7 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * Set avatarUrl
+     * Set avatarUrl.
      *
      * @param string $avatarUrl
      *
@@ -173,7 +174,7 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * Get avatarUrl
+     * Get avatarUrl.
      *
      * @return string
      */
@@ -181,36 +182,40 @@ class User implements UserInterface, \Serializable
     {
         return $this->avatarUrl;
     }
-    
 
-    public function eraseCredentials() {        
+    public function eraseCredentials()
+    {
     }
 
-    public function getRoles() {
+    public function getRoles()
+    {
         return array();
     }
 
-    public function getSalt() {
-        return null; // Change this if you're not using bcript to encode passwords !        
+    public function getSalt()
+    {
+        return; // Change this if you're not using bcript to encode passwords !
     }
 
-    public function serialize() {
-        return serialize(array(
-            $this->id,
-            $this->username,
-            $this->password,            
+    public function serialize()
+    {
+        return serialize(
+            array(
+                $this->id,
+                $this->username,
+                $this->password,
                 // $this->salt,
-        ));        
+            )
+        );
     }
 
-    public function unserialize($serialized) {
-        list (
+    public function unserialize($serialized)
+    {
+        list(
                 $this->id,
                 $this->username,
                 $this->password,
                 // $this->salt
-                ) = unserialize($serialized);        
+                ) = unserialize($serialized);
     }
-
 }
-

@@ -18,45 +18,58 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Description of UserType
+ * Description of UserType.
  *
  * @author reda
  */
-
-
 class UserType extends AbstractType
 {
-    const USER_AVATAR_DIR = "/../web/uploads/avatars";
+    const USER_AVATAR_DIR = '/../web/uploads/avatars';
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder)
     {
         $builder
-                ->add('username', null, array(
+            ->add(
+                'username',
+                null,
+                array(
                     'required' => true,
-                    ))
-                ->add('email', EmailType::class, array(
+                )
+            )
+            ->add(
+                'email',
+                EmailType::class,
+                array(
                     'required' => true,
-                    ))
-                ->add('password', RepeatedType::class, array(
+                )
+            )
+            ->add(
+                'password',
+                RepeatedType::class,
+                array(
                     'type' => PasswordType::class,
                     'required' => true,
-                    'first_options'  => array('label' => 'Password'),
+                    'first_options' => array('label' => 'Password'),
                     'second_options' => array('label' => 'Repeat Password'),
-                    ))
-                ->add('avatarUrl', FileType::class, array(
+                )
+            )
+            ->add(
+                'avatarUrl',
+                FileType::class,
+                array(
                     'required' => false,
-                ))
-                ->add('save', SubmitType::class)
-            ;
-    }
-    
-    
-    public function configureOptions(OptionsResolver $resolver) 
-    {
-        $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Entity\User',
-            'allow_extra_fields' => true,
-        ));
+                )
+            )
+            ->add('save', SubmitType::class);
     }
 
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(
+            array(
+                'data_class' => 'AppBundle\Entity\User',
+                'allow_extra_fields' => true,
+            )
+        );
+    }
 }

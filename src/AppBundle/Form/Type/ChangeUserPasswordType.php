@@ -9,8 +9,8 @@
 namespace AppBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -19,23 +19,24 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @author reda
  */
-class UpdateUserType extends AbstractType
+class ChangeUserPasswordType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder)
     {
         $builder
             ->add(
-                'email',
-                EmailType::class,
+                'oldPassword',
+                PasswordType::class,
                 array(
                     'required' => true,
                 )
             )
             ->add(
-                'avatarUrl',
-                FileType::class,
+                'newPassword',
+                RepeatedType::class,
                 array(
-                    'required' => false,
+                    'type' => PasswordType::class,
+                    'required' => true,
                 )
             );
     }
@@ -44,7 +45,7 @@ class UpdateUserType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'data_class' => 'AppBundle\Entity\User',
+                'data_class' => 'AppBundle\Form\Model\ChangeUserPassword',
                 'allow_extra_fields' => true,
             )
         );
