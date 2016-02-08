@@ -26,7 +26,7 @@ class UserType extends AbstractType
 {
     const USER_AVATAR_DIR = '/../web/uploads/avatars';
 
-    public function buildForm(FormBuilderInterface $builder)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add(

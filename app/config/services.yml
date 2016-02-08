@@ -4,6 +4,15 @@ parameters:
 #    parameter_name: value
 
 services:
-#    service_name:
-#        class: AppBundle\Directory\ClassName
-#        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+    
+    app.user_repository:
+        class: AppBundle\Repository\UserRepository
+        factory: ["@doctrine", getRepository]
+        arguments: 
+            - AppBundle\Entity\User
+            
+            
+    app.user_service:
+        class: AppBundle\Service\UserService
+        arguments: ['@app.user_repository']
+

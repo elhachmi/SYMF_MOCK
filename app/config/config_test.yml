@@ -6,6 +6,7 @@ framework:
     session:
         storage_id: session.storage.mock_file
     profiler:
+        enabled: true
         collect: false
 
 web_profiler:
@@ -13,4 +14,21 @@ web_profiler:
     intercept_redirects: false
 
 swiftmailer:
-    disable_delivery: true
+    disable_delivery: 
+        
+services:
+    
+#    app.user_service:
+#        class: AppBundle\Service\Mock\UserServiceMock
+    
+
+liip_functional_test: 
+    cache_sqlite_db: true
+
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                driver:   pdo_sqlite
+                path:     %kernel.cache_dir%/test.db
