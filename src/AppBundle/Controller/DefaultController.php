@@ -12,6 +12,6 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-        return $this->redirect('/signup');
+        return $this->redirect('/login');
     }
 }

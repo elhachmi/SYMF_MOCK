@@ -10,8 +10,6 @@ use AppBundle\Form\Model\ChangeUserPassword;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -30,41 +28,16 @@ class UserController extends Controller
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            if ($this->isUserEmailAlreadyExisted($user->getEmail())) {
-                $form->addError(new FormError('email already used'));
-            }
-            if ($this->isUsernameAlreadyExisted($user->getUsername())) {
-                $form->addError(new FormError('username already used'));
-            }
+        if ($form->isSubmitted() && $form->isValid()) {
+            // create user and store the avatar ...
+            $this->get("app.user_service")->createUser($user);
 
-            if ($form->isValid()) {
-                // Upload user avatar ...
+            //Authenticate User so he can access to profile
+            $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
+            $this->get('security.token_storage')->setToken($token); //now the user is logged in
+            $this->get('session')->set('_security_main', serialize($token));
 
-                $this->uploadUserAvatar($user);
-
-                // Encode pasword ...
-
-                $password = $this->get('security.password_encoder')
-                    ->encodePassword($user, $user->getPassword());
-
-                $user->setPassword($password);
-
-                // create user ...
-
-                $em = $this->getDoctrine()->getManager();
-
-                $em->persist($user);
-
-                $em->flush();
-
-                //Authenticate User so he can access to profile
-                $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
-                $this->get('security.token_storage')->setToken($token); //now the user is logged in
-                $this->get('session')->set('_security_secured_area', serialize($token));
-
-                return $this->redirectToRoute('user_info', array('id' => $user->getId()));
-            }
+            return $this->redirectToRoute('user_info', array('id' => $user->getId()));
         }
 
         return $this->render(
@@ -75,73 +48,12 @@ class UserController extends Controller
         );
     }
 
-    private function uploadUserAvatar(User $user)
-    {
-
-        /**
- * @var UploadedFile $file
-*/
-        $file = $user->getAvatarUrl();
-
-        if ($file != null) {
-            $username = $user->getUsername();
-
-            $username = trim($username);
-
-            $username = preg_replace('/\s+/', '_', $username);
-
-            $fileName = $username.'_avatar.'.$file->guessExtension();
-
-            $avatarsDir = $this->container->getParameter('kernel.root_dir').UserType::USER_AVATAR_DIR;
-
-            $file->move($avatarsDir, $fileName);
-
-            $user->setAvatarUrl($fileName);
-        }
-    }
-
-    private function isUsernameAlreadyExisted($username)
-    {
-        // validate username ...
-
-        $repository = $this->getDoctrine()->getRepository('AppBundle:User');
-
-        $usersWithSameUsername = $repository->findByUsername($username);
-
-        if (count($usersWithSameUsername) != null) {
-            return true;
-        }
-
-        return false;
-    }
-
-    private function isUserEmailAlreadyExisted($email)
-    {
-        // validate email ...
-
-        $repository = $this->getDoctrine()->getRepository('AppBundle:User');
-
-        $usersWithSameEmail = $repository->findByEmail($email);
-
-        if (count($usersWithSameEmail) != null) {
-            return true;
-        }
-
-        return false;
-    }
-
     /**
      * @Route("user/{id}" ,name="user_info")
      */
-
     public function getUserInfo($id)
     {
-//        $user = $this->getDoctrine()
-//            ->getRepository('AppBundle:User')
-//            ->find($id);
-        
-        $userService = $this->get('app.user_service');
-        $user = $userService->findUser($id);
+        $user = $this->get('app.user_service')->findUser($id);
 
         return $this->render(
             'profile.html.twig',
@@ -156,8 +68,7 @@ class UserController extends Controller
      */
     public function updateProfileAction($id, Request $request)
     {
-        $user = $this->getDoctrine()->getRepository('AppBundle:User')->find($id);
-        $oldEmail = $user->getEmail(); // TODO find a way to get all modified fields
+        $user = $this->get('app.user_service')->findUser($id);
         $oldUserAvatarUrl = $user->getAvatarUrl();
 
         try {
@@ -171,23 +82,15 @@ class UserController extends Controller
         $form = $this->createForm(UpdateUserType::class, $user);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            if ($oldEmail != $user->getEmail() && $this->isUserEmailAlreadyExisted($user->getEmail())) {
-                $form->addError(new FormError('Email already used'));
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($user->getAvatarUrl() != null) {
+                $this->get("app.user_service")->uploadUserAvatar($user);
+            } else {
+                $user->setAvatarUrl($oldUserAvatarUrl);
             }
+            $this->get('app.user_service')->updateUser($user);
 
-            if ($form->isValid()) {
-                if ($user->getAvatarUrl() != null) {
-                    $this->uploadUserAvatar($user);
-                } else {
-                    $user->setAvatarUrl($oldUserAvatarUrl);
-                }
-                $em = $this->getDoctrine()->getEntityManager();
-                $em->persist($user);
-                $em->flush();
-
-                return $this->redirectToRoute('user_info', array('id' => $user->getId()));
-            }
+            return $this->redirectToRoute('user_info', array('id' => $user->getId()));
         }
 
         return $this->render(
@@ -205,21 +108,14 @@ class UserController extends Controller
      */
     public function changePasswordAction($id, Request $request)
     {
-        $user = $this->getDoctrine()->getRepository('AppBundle:User')->find($id);
+        $user = $this->get('app.user_service')->findUser($id);
 
         $changeUserPasswordModel = new ChangeUserPassword();
         $form = $this->createForm(ChangeUserPasswordType::class, $changeUserPasswordModel);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Encode pasword ...
-            $encoder = $this->get('security.password_encoder');
-            $password = $encoder->encodePassword($user, $changeUserPasswordModel->getNewPassword());
-            $user->setPassword($password);
-
-            $em = $this->getDoctrine()->getEntityManager();
-            $em->persist($user);
-            $em->flush();
+        if ($form->isSubmitted() && $form->isValid()) {            
+            $this->get('app.user_service')->changeUserPassword($user, $changeUserPasswordModel->getNewPassword());
 
             return $this->redirectToRoute('user_info', array('id' => $user->getId()));
         }
