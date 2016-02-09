@@ -23,14 +23,14 @@ class UserService implements Api\UserService{
     
     protected $userRepository;
     protected $passwordEncoder;
-    protected $container;
+    protected $kernelRootDir;
 
 
-    public function __construct(UserRepository $userRepository, $passwordEncoder, $container) 
+    public function __construct(UserRepository $userRepository, $passwordEncoder, $kernelRootDir) 
     {
         $this->userRepository = $userRepository;
         $this->passwordEncoder = $passwordEncoder;
-        $this->container = $container;
+        $this->kernelRootDir = $kernelRootDir;
     }
 
 
@@ -61,7 +61,8 @@ class UserService implements Api\UserService{
         return $this->userRepository->find($id);
     }
 
-    public function uploadUserAvatar(User $user) {
+    public function uploadUserAvatar(User $user) 
+    {
         /**
          * @var UploadedFile $file
          */
@@ -73,7 +74,7 @@ class UserService implements Api\UserService{
 
             $fileName = $username.'_avatar.'.$file->guessExtension();
 
-            $avatarsDir = $this->container->getParameter('kernel.root_dir').self::USER_AVATAR_DIR;
+            $avatarsDir = $this->kernelRootDir .''. self::USER_AVATAR_DIR;
 
             $file->move($avatarsDir, $fileName);
 
@@ -81,7 +82,8 @@ class UserService implements Api\UserService{
         }        
     }
 
-    public function changeUserPassword(User $user, $newPassword) {
+    public function changeUserPassword(User $user, $newPassword) 
+    {
         // Encode pasword ...
         $password = $this->passwordEncoder->encodePassword($user, $newPassword);
         $user->setPassword($password);   

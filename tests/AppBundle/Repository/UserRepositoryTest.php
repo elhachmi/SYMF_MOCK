@@ -1,42 +1,38 @@
 <?php
 
-use DoctrineExtensions\PHPUnit\OrmTestCase;
 use AppBundle\Entity\User;
-//use AppBundle\Repository\UserRepository;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\SchemaTool;
-use Doctrine\ORM\Tools\Setup;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class UserRepositoryTest extends OrmTestCase {
+class UserRepositoryTest extends KernelTestCase {
 
     /**
-     * @var EntityManager
+     * @var \Doctrine\ORM\EntityManager
      */
-    protected static $em = null;
+    private $em;
+    
+    private $repository;
 
-    public static function setUpBeforeClass() {
-        $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__ . "/../../../src"), true, null, null, false);
-        $connectionOptions = array('driver' => 'pdo_sqlite', 'memory' => true);
-        // obtaining the entity manager
-        self::$em = EntityManager::create($connectionOptions, $config);
-        $schemaTool = new SchemaTool(self::$em);
-        $cmf = self::$em->getMetadataFactory();
-        $classes = $cmf->getAllMetadata();
-        $schemaTool->dropDatabase();
-        $schemaTool->createSchema($classes);
+    /**
+     * {@inheritDoc}
+     */
+    protected function setUp() {
+        self::bootKernel(array('environment' => 'test'));
+        $this->em = static::$kernel->getContainer()
+                ->get('doctrine')
+                ->getManager();
+        
+        $this->em->beginTransaction();
+        $this->repository = $this->em->getRepository("AppBundle:User");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function tearDown() {
-        self::$em->clear();
+        $this->em->rollback();
+        
         parent::tearDown();
-    }
-
-    protected function createEntityManager() {
-        return self::$em;
-    }
-
-    protected function getDataSet() {
-        return $this->createFlatXmlDataSet(__DIR__ . "/../DataSets/dataset.xml");
+        $this->em->close();
     }
 
     public function testCreateUser() {
@@ -46,26 +42,44 @@ class UserRepositoryTest extends OrmTestCase {
         $user->setPassword("$2y$13$9z7J/8pHLBd4OC7sJQZiFe.C79rBWzByn0Z9V4Viu5hESJ2E4cvj2");
         $user->setEmail("user3@test.com");
         $user->setAvatarUrl("user3_avatar");
+        
+        $this->repository->createUser($user);
 
-        //$repository = new UserRepository();
-        //$repository->createUser($user);
-        //$this->assertEquals(3, $user->getId());
-        //$this->assertEquals(, );
+        $this->assertTrue( count($this->repository->findAll()) > 1); //The Test DB contains one user already (admin for authentication)
+        
+        $newUser = $this->repository->find($user->getId());
+        $this->assertNotNull($newUser);
+        $this->assertEquals( $newUser->getId(), $user->getId());
+        $this->assertEquals( $newUser->getUsername(), $user->getUsername());
+        $this->assertEquals( $newUser->getEmail(), $user->getEmail());
+        $this->assertEquals( $newUser->getPassword(), $user->getPassword());
+        // TODO find a way to compare two objects
+        
     }
 
     public function testUpdateUser() {
 
         $user = new User();
-        $user->setId(1);
         $user->setUsername("user1");
         $user->setPassword("$2y$13$9z7J/8pHLBd4OC7sJQZiFe.C79rBWzByn0Z9V4Viu5hESJ2E4cvj2");
         $user->setEmail("username1@test.com");
         $user->setAvatarUrl("user3_avatar.jpg");
-
-        //$repository = new UserRepository();
-        //$repository->updateUser($user);
-        //$this->assertEquals(, );
-        //$this->assertEquals(, );
+        
+        $this->em->persist($user); // Not using createUser from our repository, not safe
+        $this->em->flush();
+        
+        $newUser = $this->repository->find($user->getId());        
+        $newUsername = "newUsername";
+        $newUser->setUsername($newUsername);
+        $this->repository->updateUser($newUser);
+        
+        $updatedUser = $this->repository->find($newUser->getId());
+        $this->assertNotNull($updatedUser);
+        $this->assertEquals( $updatedUser->getId(), $newUser->getId());
+        $this->assertEquals( $updatedUser->getUsername(), $newUser->getUsername());
+        $this->assertEquals( $updatedUser->getEmail(), $newUser->getEmail());
+        $this->assertEquals( $updatedUser->getPassword(), $newUser->getPassword());
+        // TODO find a way to compare two objects        
     }
 
 }

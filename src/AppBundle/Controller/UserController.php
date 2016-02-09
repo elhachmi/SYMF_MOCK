@@ -25,7 +25,6 @@ class UserController extends Controller
         $user = new User();
 
         $form = $this->createForm(UserType::class, $user);
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

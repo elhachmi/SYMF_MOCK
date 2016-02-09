@@ -14,5 +14,5 @@ services:
             
     app.user_service:
         class: AppBundle\Service\UserService
-        arguments: ['@app.user_repository', '@security.password_encoder', '@service_container']
+        arguments: ['@app.user_repository', '@security.password_encoder', '%kernel.root_dir%']
 
