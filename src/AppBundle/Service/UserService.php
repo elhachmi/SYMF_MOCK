@@ -16,24 +16,36 @@ use AppBundle\Repository\UserRepository;
  *
  * @author reda
  */
-class UserService {
+class UserService implements Api\UserService{
     
     const USER_AVATAR_DIR = "/../web/uploads/avatars";
     const AVATAR_NAME_POSTFIX = "_avatar.";
     
     protected $userRepository;
+    protected $passwordEncoder;
+    protected $container;
 
 
-    public function __construct(UserRepository $userRepository) 
+    public function __construct(UserRepository $userRepository, $passwordEncoder, $container) 
     {
         $this->userRepository = $userRepository;
+        $this->passwordEncoder = $passwordEncoder;
+        $this->container = $container;
     }
 
 
     public function createUser(User $user)
     {
+        // Encode pasword ...
+        $password = $this->passwordEncoder->encodePassword($user, $user->getPassword());
+        $user->setPassword($password);
+        
+        // Store avatar
+        $this->uploadUserAvatar($user);
+        
         // create user ...
         $this->userRepository->createUser($user);
+        
         return $user;
     }
     
@@ -44,38 +56,38 @@ class UserService {
         return $user;
     }
     
-    public function isUserEmailAlreadyExisted($email)
-    {
-        // validate email ...
-
-//        $repository = $this->em->getRepository('AppBundle:User');
-        
-        $usersWithSameEmail = $this->userRepository->findByEmail($email);
-         
-        if (count($usersWithSameEmail) != null) {
-             return true;
-        }
-        return false;
-    }
-    
-    public function isUserUsernameAlreadyExisted($username)
-    {
-        // validate username ...
-
-//        $repository = $this->em->getRepository('AppBundle:User');
-        
-        $usersWithSameUsername = $this->userRepository->findByEmail($username);
-         
-        if (count($usersWithSameUsername) != null) {
-             return true;
-        }
-        return false;
-    }
-    
-
     public function findUser($id) 
     {
         return $this->userRepository->find($id);
+    }
+
+    public function uploadUserAvatar(User $user) {
+        /**
+         * @var UploadedFile $file
+         */
+        $file = $user->getAvatarUrl();
+
+        if ($file != null) {
+            $username = trim($user->getUsername());
+            $username = preg_replace('/\s+/', '_', $username);
+
+            $fileName = $username.'_avatar.'.$file->guessExtension();
+
+            $avatarsDir = $this->container->getParameter('kernel.root_dir').self::USER_AVATAR_DIR;
+
+            $file->move($avatarsDir, $fileName);
+
+            $user->setAvatarUrl($fileName);
+        }        
+    }
+
+    public function changeUserPassword(User $user, $newPassword) {
+        // Encode pasword ...
+        $password = $this->passwordEncoder->encodePassword($user, $newPassword);
+        $user->setPassword($password);   
+        
+        //Update User
+        $this->updateUser($user);
     }
 
 }

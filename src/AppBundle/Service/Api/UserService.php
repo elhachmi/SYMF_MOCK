@@ -19,5 +19,7 @@ interface UserService {
     public function createUser(User $user);
     public function updateUser(User $user);
     public function findUser($id);
+    public function uploadUserAvatar(User $user);
+    public function changeUserPassword(User $user, $newPassword);
     
 }
