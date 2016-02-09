@@ -1,4 +1,4 @@
 # SYMF_MOCK
-Exercie d'entrainement
+Exercice d'entrainement
 
 //TODO
