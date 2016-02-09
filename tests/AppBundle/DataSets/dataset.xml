@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <user id="1" username="user1" password="$2y$13$9z7J/8pHLBd4OC7sJQZiFe.C79rBWzByn0Z9V4Viu5hESJ2E4cvj2" 
+          email="user1@test.com" avatarUrl="default_avatar.jpg" />
+    
+    <user id="2" username="user2" password="$2y$13$9z7J/8pHLBd4OC7sJQZiFe.C79rBWzByn0Z9V4Viu5hESJ2E4cvj2" 
+          email="user2@test.com" avatarUrl="default_avatar.jpg" />
+</dataset>
