@@ -1,0 +1,9 @@
+box: wercker/php
+services:
+    - wercker/mysql
+build:
+    steps:
+    -  script:
+          name: Test
+          code: |-
+              phpunit
